@@ -1,0 +1,35 @@
+<h1>Edit Animal</h1>
+<form method="post">
+    {% csrf_token %}
+    
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender" required>
+        <option value="Male" {% if animal.gender == 'Male' %}selected{% endif %}>Male</option>
+        <option value="Female" {% if animal.gender == 'Female' %}selected{% endif %}>Female</option>
+    </select><br>
+
+    <label for="health_status">Health Status:</label>
+    <select id="health_status" name="health_status" required>
+        <option value="Good" {% if animal.health_status == 'Good' %}selected{% endif %}>Good</option>
+        <option value="Bad" {% if animal.health_status == 'Bad' %}selected{% endif %}>Bad</option>
+    </select><br>
+
+    <label for="animal_type">Animal Type:</label>
+    <select id="animal_type" name="animal_type" required>
+        <option value="{{ animal.animal_type.id }}" selected>{{ animal.animal_type.name }}</option>
+        {% for animal_type in animal_types %}
+            <option value="{{ animal_type.id }}">{{ animal_type.name }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="resources">Resources:</label>
+    <select id="resources" name="resources"  required>
+        {% for resource in resources %}
+            <option value="{{ resource.id }}" {% if resource in animal.resources.all %}selected{% endif %}>
+                {{ resource.name }}
+            </option>
+        {% endfor %}
+    </select><br>
+
+    <button type="submit">Save</button>
+</form>

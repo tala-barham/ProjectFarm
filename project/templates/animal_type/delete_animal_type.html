@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Animal Type</title>
+</head>
+<body>
+    <h1>Delete Animal Type</h1>
+    <p>Are you sure you want to delete {{ animal_type.name }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+        <a href="{% url 'animal_types' %}">Cancel</a>
+    </form>
+</body>
+</html>

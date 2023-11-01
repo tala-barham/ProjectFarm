@@ -1,0 +1,8 @@
+<h1>Confirm Deletion</h1>
+<p>Are you sure you want to delete "{{ resource.name }} -{{ resource.quantity }} - {{ resource.expiration_date }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button>Delete</button>
+    <a href="{% url 'resources' %}">Cancel</a>
+</form>
+

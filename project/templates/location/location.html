@@ -1,0 +1,18 @@
+<h1>Welcome To Location Page</h1>
+<a href="{% url 'add_location' %}">Add Location</a>
+<ul>
+    {% for location in locations %}
+      <li>
+        {{ location.name }}
+        <a href="{% url 'delete_location' location.id %}">Delete</a>
+      </li>
+    {% endfor %}
+  </ul><br>
+  <h3>Select the page </h3>
+<ul>
+    <li><a href="{% url 'farm' %}">Farm Page</a></li>
+    <li><a href="{% url 'farmer' %}">Farmer Page</a></li>
+    <li><a href="{% url 'resources' %}">Resource Page</a></li>
+    <li><a href="{% url 'animal' %}">Animal Page</a></li>
+    <li><a href="{% url 'animal_types' %}">Animal Type Page</a></li>
+</ul>

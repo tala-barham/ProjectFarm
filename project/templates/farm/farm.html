@@ -1,0 +1,20 @@
+<h1>Welcome To Farm Page</h1>
+
+<a href="{% url 'add_farm' %}">Add Farm</a>
+<ul>
+  {% for farm in farms %}
+    <li>
+      {{ farm.name }} - {{ farm.size }} 
+      <a href="{% url 'delete_farm' farm.id %}">Delete</a>
+      <a href="{% url 'edit_farm' farm.id %}">Edit</a>
+    </li>
+  {% endfor %}
+</ul><br>
+<h3>Select the page </h3>
+<ul>
+    <li><a href="{% url 'location' %}">Location Page</a></li>
+    <li><a href="{% url 'farmer' %}">Farmer Page</a></li>
+    <li><a href="{% url 'resources' %}">Resource Page</a></li>
+    <li><a href="{% url 'animal' %}">Animal Page</a></li>
+    <li><a href="{% url 'animal_types' %}">Animal Type Page</a></li>
+</ul>

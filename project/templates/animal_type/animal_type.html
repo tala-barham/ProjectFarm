@@ -1,0 +1,22 @@
+
+    <title>Animal Types</title>
+    <h1>Animal Types</h1>
+    <a href="{% url 'add_animal_type' %}">Add Animal Type</a>
+    <ul>
+        {% for animal_type in animal_types %}
+            <li>
+                {{ animal_type.name }}
+                <a href="{% url 'delete_animal_type' animal_type.id %}">Delete</a>
+                <a href="{% url 'edit_animal_type' animal_type.id %}">Edit</a>
+            </li>
+        {% endfor %}
+    </ul><br>
+
+    <h3>Select the page </h3>
+<ul>
+    <li><a href="{% url 'location' %}">Location Page</a></li>
+    <li><a href="{% url 'farmer' %}">Farmer Page</a></li>
+    <li><a href="{% url 'resources' %}">Resource Page</a></li>
+    <li><a href="{% url 'animal' %}">Animal Page</a></li>
+    <li><a href="{% url 'farm' %}">Farm Page</a></li>
+</ul>

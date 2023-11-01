@@ -1,0 +1,24 @@
+<title>Home Page</title>
+</head>
+<body>
+    <h1>Welcome to the Farm Management System</h1>
+    <h2>templates list</h2>
+    <ul>
+        <li><a href="{% url 'farm' %}">Farm Page</a></li>
+        <li><a href="{% url 'location' %}">Location Page</a></li>
+        <li><a href="{% url 'farmer' %}">Farmer Page</a></li>
+        <li><a href="{% url 'resources' %}">Resource Page</a></li>
+        <li><a href="{% url 'animal' %}">Animal Page</a></li>
+        <li><a href="{% url 'animal_types' %}">Animal Type Page</a></li>
+    </ul>
+    <h2>API List</h2>
+    <ul>
+        <li><a href="{% url 'location_api' %}">Location Page</a></li>
+        <li><a href="{% url 'farm_api' %}">Farm Page</a></li>
+        <li><a href="{% url 'farmer_api' %}">Farmer Page</a></li>
+        <li><a href="{% url 'resource_api' %}">Resource Page</a></li>
+        <li><a href="{% url 'animal_api' %}">Animal Page</a></li>
+        <li><a href="{% url 'animal_type_api' %}">Animal Type Page</a></li>
+    </ul>
+</body>
+</html>
