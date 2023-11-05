@@ -28,7 +28,7 @@ class Resource(models.Model):
     farm_resource=models.ManyToManyField(Farm)
 
     def __str__(self):
-        return str(self.quantity)
+        return str(self.name)
     
 class AnimalType(models.Model):
     name = models.CharField(max_length=100)
@@ -41,8 +41,12 @@ class Animal(models.Model):
         ('Male', 'Male'),
         ('Female', 'Female'),
     ]
+    HEALTH_CHOICES = [
+        ('good', 'Good'),
+        ('bad', 'Bad'),
+    ]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    health_status = models.CharField(max_length=100)
+    health_status = models.CharField(max_length=10, choices=HEALTH_CHOICES)
     resources = models.ManyToManyField(Resource)
     animal_type = models.ForeignKey(AnimalType, on_delete=models.CASCADE) 
 

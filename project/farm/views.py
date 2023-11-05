@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from.models import Farm,Farmer,Animal,AnimalType,Resource,Location
+from .forms import LocationForm, FarmForm, FarmerForm, ResourceForm, AnimalTypeForm, AnimalForm
 
 # Create your views here.
 
@@ -31,134 +32,57 @@ def resource(request):
     resources=Resource.objects.all() 
     return render(request, 'resource/resource.html',{'resources':resources})
 
+##edit,and function
+def add_edit_item(request, model, form_class, template_name, redirect_name, instance_id=None):
+    instance = None
+    if instance_id:
+        instance = model.objects.get(id=instance_id)
+    if request.method == 'POST':
+        form = form_class(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect(redirect_name)
+    else:
+        form = form_class(instance=instance)
+    return render(request, template_name, {'form': form, 'instance': instance})
+
 #add functions
-def add_object(request, model, data, redirect_name):
-    if request.method == 'POST':
-        model.objects.create(**data)
-        return redirect(redirect_name)
-    
-def add_item(request, model, template_name, redirect_name, fields):
-    if request.method == 'POST':
-        data = {field: request.POST.get(field) for field in fields}
-        model.objects.create(**data)
-        return redirect(redirect_name)
-    return render(request, template_name)    
-    
 def add_location(request):
-    return add_item(request, Location, 'location/add_location.html', 'location', ['name'])     
+    return add_edit_item(request, Location, LocationForm, 'location/location_form.html', 'location')
 
 def add_farmer(request):
-    return add_item(request, Farmer, 'farmer/add_farmer.html', 'farmer', ['name']) 
+    return add_edit_item(request, Farmer ,FarmerForm, 'farmer/farmer_form.html', 'farmer') 
 
 def add_animal_type(request):
-    return add_item(request, AnimalType, 'animal_type/add_animal_type.html', 'animal_types', ['name'])
+    return add_edit_item(request, AnimalType , AnimalTypeForm, 'animal_type/animal_type_form.html', 'animal_types')
 
 def add_farm(request):
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-            'size': request.POST.get('size'),
-            'location_id': request.POST.get('location'),
-        }
-        return add_object(request, Farm, data, 'farm') 
-    locations=Location.objects.all()
-    return render(request, 'farm/add_farm.html', {'locations': locations})
+    return add_edit_item(request, Farm ,FarmForm, 'farm/farm_form.html', 'farm')
 
 def add_animal(request):
-    if request.method == 'POST':
-        data = {
-            'gender': request.POST.get('gender'),
-            'health_status': request.POST.get('health_status'),
-            'animal_type_id': request.POST.get('animal_type'),
-        }
-        return add_object(request, Animal, data, 'animal') 
-    resources=Resource.objects.all()
-    animal_types=AnimalType.objects.all()
-    return render(request, 'animal/add_animal.html', {'animal_types':animal_types , 'resources': resources})
+    return add_edit_item(request, Animal, AnimalForm, 'animal/animal_form.html', 'animal')
 
 def add_resource(request):
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-            'quantity': request.POST.get('quantity'),
-            'expiration_date': request.POST.get('expiration_date'),
-        }
-        return add_object(request, Resource, data, 'resources')
-    farms = Farm.objects.all()
-    return render(request, 'resource/add_resource.html', {'farms': farms})
+    return add_edit_item(request, Resource ,ResourceForm, 'resource/resource_form.html', 'resources')
 
 #edit functions
-def edit_object_attributes(obj, data):
-    for field, value in data.items():
-        setattr(obj, field, value)
-    obj.save()
+def edit_location(request, location_id):
+    return add_edit_item(request, Location, LocationForm, 'location/location_form.html', 'location', location_id)
 
 def edit_farm(request, farm_id):
-    farm = get_object_or_404(Farm, pk=farm_id)
-    locations = Location.objects.all()
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-            'location': Location.objects.get(pk=request.POST.get('location')),
-            'size': request.POST.get('size'),
-        }
-        edit_object_attributes(farm, data)
-        return redirect('farm')
-    return render(request, 'farm/edit_farm.html', {'farm': farm, 'locations': locations})
+    return add_edit_item(request, Farm, FarmForm, 'farm/farm_form.html', 'farm', farm_id)
 
 def edit_farmer(request, farmer_id):
-    farmer = get_object_or_404(Farmer, pk=farmer_id)
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-        }
-        edit_object_attributes(farmer, data)
-        return redirect('farmer')
-    return render(request, 'farmer/edit_farmer.html', {'farmer': farmer})
+    return add_edit_item(request, Farmer, FarmerForm, 'farmer/farmer_form.html', 'farmer', farmer_id )
 
 def edit_animal(request, animal_id):
-    animal = get_object_or_404(Animal, pk=animal_id)
-    animal_types = AnimalType.objects.all()
-    resources = Resource.objects.all()
-    if request.method == 'POST':
-        data = {
-            'gender': request.POST.get('gender'),
-            'health_status': request.POST.get('health_status'),
-            'animal_type': AnimalType.objects.get(id=request.POST.get('animal_type')),
-        }
-        animal.resources.clear()
-        for resource_id in request.POST.getlist('resources'):
-            animal.resources.add(Resource.objects.get(id=resource_id))
-        edit_object_attributes(animal, data)
-        return redirect('animal')
-    return render(request, 'animal/edit_animal.html', {'animal': animal, 'animal_types': animal_types, 'resources': resources})
+    return add_edit_item(request, Animal, AnimalForm, 'animal/animal_form.html', 'animal', animal_id)
 
 def edit_animal_type(request, animal_type_id):
-    animal_type = get_object_or_404(AnimalType, pk=animal_type_id)
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-        }
-        edit_object_attributes(animal_type, data)
-        return redirect('animal_types')
-    return render(request, 'animal_type/edit_animal_type.html', {'animal_type': animal_type})
+    return add_edit_item(request, AnimalType, AnimalTypeForm, 'animal_type/animal_type_form.html', 'animal_types', animal_type_id)
 
 def edit_resource(request, resource_id):
-    resource = get_object_or_404(Resource, pk=resource_id)
-    farms = Farm.objects.all()
-    if request.method == 'POST':
-        data = {
-            'name': request.POST.get('name'),
-            'quantity': request.POST.get('quantity'),
-            'expiration_date': request.POST.get('expiration_date'),
-        }
-        edit_object_attributes(resource, data)
-        farm_id = request.POST.get('farm')
-        if farm_id:
-            farm = get_object_or_404(Farm, pk=farm_id)
-            resource.farm_resource.set([farm])
-        return redirect('resources')
-    return render(request, 'resource/edit_resource.html', {'resource': resource, 'farms': farms})
+    return add_edit_item(request, Resource, ResourceForm, 'resource/resource_form.html', 'resources', resource_id)
 
 #delete functions
 def delete_object(request, model, object_id, redirect_name, template_name):

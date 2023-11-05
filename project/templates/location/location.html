@@ -5,6 +5,7 @@
       <li>
         {{ location.name }}
         <a href="{% url 'delete_location' location.id %}">Delete</a>
+        <a href="{% url 'edit_location' location.id %}">Edit</a>
       </li>
     {% endfor %}
   </ul><br>

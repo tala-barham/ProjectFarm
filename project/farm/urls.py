@@ -26,6 +26,7 @@ urlpatterns = [
      path('delete_resource/<int:resource_id>/', views.delete_resource, name='delete_resource'),
      path('edit_resource/<int:resource_id>/', views.edit_resource, name='edit_resource'),
      path('delete_location/<int:location_id>/', views.delete_location, name='delete_location'),
+     path('edit_location/<int:location_id>/', views.edit_location, name='edit_location'),
 #api
      path('api/location', API.location_api, name='location_api'),
      path('api/farm', API.farm_api,name='farm_api'),
