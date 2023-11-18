@@ -6,72 +6,34 @@ from django.shortcuts import get_object_or_404
 
 #display functions
 def location_api(request):
-    # Retrieve data from the Location model
-    locations = Location.objects.values('name')
-    # Serialize the data to JSON
+    locations = Location.objects.values()
     data = list(locations)
-    # Return the JSON response
-    return JsonResponse(data, safe=False)
+    return JsonResponse({'locations': data})
 
 def farm_api(request):
-    # Retrieve data from the Farm model
-    farms = Farm.objects.all()
-    # Serialize the data to a JSON-serializable format
-    farm_data = []
-    for farm in farms:
-        farm_data.append({
-            'name': farm.name,
-            'size': str(farm.size),  # Convert to string to ensure JSON serializability
-            'location': farm.location.name  # Assuming 'location' has a 'name' field
-        })
-    # Return the JSON response
-    return JsonResponse(farm_data, safe=False)
+    farms = Farm.objects.values('id', 'name', 'size', 'location__name')
+    data = list(farms)
+    return JsonResponse({'farms': data})
 
 def farmer_api(request):
-    # Retrieve data from the Location model
-    farmers = Farmer.objects.values('name')
-    # Serialize the data to JSON
+    farmers = Farmer.objects.values()
     data = list(farmers)
-    # Return the JSON response
-    return JsonResponse(data, safe=False)
+    return JsonResponse({'farmers': data})
 
 def resource_api(request):
-    # Retrieve data from the Resource model
-    resources = Resource.objects.all()
-    # Serialize the data to a JSON-serializable format
-    resource_data = []
-    for resource in resources:
-        resource_data.append({
-            'name': resource.name,
-            'quantity': resource.quantity,
-            'expiration_date': resource.expiration_date.strftime('%Y-%m-%d'),
-            'farm': [farm.name for farm in resource.farm_resource.all()]  # Assuming 'Farm' has a 'name' field
-        })
-    # Return the JSON response
-    return JsonResponse(resource_data, safe=False)
+    resources = Resource.objects.values('id', 'name', 'quantity', 'expiration_date', 'farm_resource__name')
+    data = list( resources)
+    return JsonResponse({'resources': data})
 
 def animal_type_api(request):
-    # Retrieve data from the AnimalType model
-    animal_types = AnimalType.objects.values('name')
-    # Serialize the data to a JSON-serializable format
-    animal_type_data = list(animal_types)
-    # Return the JSON response
-    return JsonResponse(animal_type_data, safe=False)
+    animal_types = AnimalType.objects.values()
+    data = list(animal_types)
+    return JsonResponse({'animal_types': data})
 
 def animal_api(request):
-    # Retrieve data from the Animal model
-    animals = Animal.objects.all()
-    # Serialize the data to a JSON-serializable format
-    animal_data = []
-    for animal in animals:
-        animal_data.append({
-            'gender': animal.gender,
-            'health_status': animal.health_status,
-            'animal_type': animal.animal_type.name,
-            'resources': [resource.name for resource in animal.resources.all()],
-        })
-    # Return the JSON response
-    return JsonResponse(animal_data, safe=False)
+    animals = Animal.objects.select_related('animal_type').prefetch_related('resources').values('id', 'gender', 'health_status', 'animal_type__name', 'resources__name')
+    data = list(animals)
+    return JsonResponse({'animals': data})
 
 #add functions
 @csrf_exempt    
@@ -89,7 +51,7 @@ def add_location_api(request):
         except json.JSONDecodeError:
             return JsonResponse({'message': 'Invalid JSON data'}, status=400)
     else:
-        return JsonResponse({'message': 'Invalid request method'}, status=405)
+        return JsonResponse({'message': 'Invalid request method'}, status=405) 
     
 @csrf_exempt
 def add_farm_api(request):
@@ -98,9 +60,9 @@ def add_farm_api(request):
             data = json.loads(request.body)
             name = data.get('name')
             size = data.get('size')
-            location_id = data.get('location_id')  # Assuming you pass the location ID
+            location_id = data.get('location_id')  
             if name and size and location_id:
-                location = Location.objects.get(pk=location_id)  # Retrieve the Location object
+                location = Location.objects.get(pk=location_id)  
                 farm = Farm(name=name, size=size, location=location)
                 farm.save()
                 return JsonResponse({'message': 'Farm added successfully'})
@@ -111,7 +73,7 @@ def add_farm_api(request):
     else:
         return JsonResponse({'message': 'Invalid request method'}, status=405)
     
-@csrf_exempt  # You can use @csrf_exempt to temporarily disable CSRF protection for testing (not recommended for production)
+@csrf_exempt  
 def add_farmer_api(request):
     if request.method == 'POST':
         try:
@@ -181,10 +143,12 @@ def add_animal_api(request):
             health_status = data.get('health_status')
             animal_type_id = data.get('animal_type')
             resource_ids = data.get('resources')
+            
             if gender and health_status and animal_type_id:
                 animal_type = AnimalType.objects.get(pk=animal_type_id)
                 animal = Animal(gender=gender, health_status=health_status, animal_type=animal_type)
                 animal.save()
+                
                 if resource_ids:
                     resources = Resource.objects.filter(pk__in=resource_ids)
                     animal.resources.set(resources)
