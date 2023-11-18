@@ -31,7 +31,7 @@ def animal_type_api(request):
     return JsonResponse({'animal_types': data})
 
 def animal_api(request):
-    animals = Animal.objects.select_related('animal_type').prefetch_related('resources').values('id', 'gender', 'health_status', 'animal_type__name', 'resources__name')
+    animals = Animal.objects.values('id', 'gender', 'health_status', 'animal_type__name', 'resources__name')
     data = list(animals)
     return JsonResponse({'animals': data})
 
